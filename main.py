@@ -2,13 +2,18 @@ import discord
 import os
 import requests
 import json
+import random
 
 client = discord.Client(intents=discord.Intents.all())
 
-def Convert(lst):
-    it = iter(lst)
-    res_dct = dict(zip(it, it))
-    return res_dct
+sad_words = ["sad", "depressed", "unhappy", "uninspired", "depressing"]
+
+starter_encouragements = [
+  "Cheer up!", 
+  "Hang in there!", 
+  "You got this, don't give up!", 
+  "https://www.youtube.com/watch?v=KxGRhd_iWuE"
+]
 
 def get_quote():
   category = ''
@@ -28,12 +33,17 @@ async def on_message(message):
   if message.author == client.user:
     return
 
-  if message.content.startswith('/hello'):
+  msg = message.content
+  
+  if msg.startswith('/hello'):
     await message.channel.send('Hello!')
 
-  if message.content.startswith('$quote'):
+  if msg.startswith('/quote'):
     quote = json.loads(get_quote())
     text = quote[0]
     await message.channel.send(text['quote'] + "\n-" + text['author'])
+
+  if any(word in msg for word in sad_words):
+    await message.channel.send(random.choice(starter_encouragements))
 
 client.run(os.getenv('TOKEN'))
